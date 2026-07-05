@@ -1,0 +1,4 @@
+app_name:
+remote_admin:
+user_password:
+ansible_become_pass:
