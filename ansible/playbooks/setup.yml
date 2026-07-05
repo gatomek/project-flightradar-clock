@@ -1,0 +1,43 @@
+- name: Setup radar-clock on castle
+  vars_files:
+    - vars/prod.yml
+  gather_facts: no
+  hosts: castle
+  become: true
+  become_method: sudo
+  remote_user: "{{remote_admin}}"
+  tasks:
+    - name: "Creating user {{app_name}}"
+      user:
+        name: "{{app_name}}"
+        shell: /bin/bash
+        create_home: yes
+        password: "{{user_password | password_hash('sha512') }}"
+        state: present
+    - name: "Create folder app in {{app_name}} home folder"
+      file:
+        path: "/home/{{app_name}}/app"
+        state: directory
+        owner: "{{app_name}}"
+        group: "{{app_name}}"
+        mode: '0700'
+    - name: Copy app to app folder
+      copy:
+        src: "../../target/{{app_name}}-jar-with-dependencies.jar"
+        dest: "/home/{{app_name}}/app/{{app_name}}.jar"
+        owner: "{{app_name}}"
+        group: "{{app_name}}"
+    - name: "Render {{app_name}}.service config file to /etc/systemd/system folder"
+      template:
+        src: "./data/radar-clock.service"
+        dest: /etc/systemd/system
+        owner: root
+        group: root
+    - name: Reload systemd
+      systemd:
+        daemon_reload: yes
+    - name: "Start a {{app_name}} service"
+      systemd:
+        name: "{{app_name}}"
+        state: started
+        enabled: true

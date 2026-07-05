@@ -1,0 +1,13 @@
+- name: Restart radar-clock on castle
+  vars_files:
+    - vars/prod.yml
+  gather_facts: no
+  hosts: castle
+  become: true
+  become_method: sudo
+  remote_user: "{{remote_admin}}"
+  tasks:
+    - name: Restart radar-clock service
+      systemd:
+        state: started
+        name: radar-clock
