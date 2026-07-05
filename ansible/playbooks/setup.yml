@@ -27,16 +27,16 @@
         dest: "/home/{{app_name}}/app/{{app_name}}.jar"
         owner: "{{app_name}}"
         group: "{{app_name}}"
-    - name: "Render {{app_name}}.service config file to /etc/systemd/system folder"
+    - name: "Render template to /etc/systemd/system/{{app_name}}.service"
       template:
-        src: "./data/radar-clock.service"
-        dest: /etc/systemd/system
+        src: "data/template.service"
+        dest: "/etc/systemd/system/{{app_name}}.service"
         owner: root
         group: root
     - name: Reload systemd
       systemd:
         daemon_reload: yes
-    - name: "Start a {{app_name}} service"
+    - name: "Start and Enable a {{app_name}} service"
       systemd:
         name: "{{app_name}}"
         state: started
