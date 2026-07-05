@@ -1,0 +1,13 @@
+- name: Stop radar-clock on castle
+  vars_files:
+    - vars/prod.yml
+  gather_facts: no
+  hosts: castle
+  become: true
+  become_method: sudo
+  remote_user: "{{remote_admin}}"
+  tasks:
+    - name: Stop radar-clock service
+      systemd:
+        state: stopped
+        name: radar-clock
